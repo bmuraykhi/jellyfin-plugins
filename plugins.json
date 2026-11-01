@@ -1,0 +1,24 @@
+[
+  {
+    "repo": "bmuraykhi/Sub-Jellyfin",
+    "asset": "season-subtitle-downloader.zip",
+    "name": "Season Subtitle Downloader",
+    "guid": "a3c0e5c3-7d0d-4b91-9d1c-2e6f9b3a1c5d",
+    "description": "Adds a 'Download Subs' button to season and series pages that batch-downloads subtitles for every episode, in one or more languages.",
+    "overview": "One-click subtitle downloads for a whole season or series, in as many languages as you need. Requires the File Transformation plugin.",
+    "owner": "Bandar",
+    "category": "General",
+    "imageUrl": "https://raw.githubusercontent.com/bmuraykhi/Sub-Jellyfin/main/assets/icon.png"
+  },
+  {
+    "repo": "bmuraykhi/jellyfin-plugin-untrack",
+    "asset": "untrack-show.zip",
+    "name": "Untrack Show",
+    "guid": "b54dbd71-0824-420d-974c-b4f74ceed8f6",
+    "description": "Adds \"Untrack show\" to the episode, season and show menus in the web client and the Jellyfin phone apps. It marks the whole show unplayed for you, which removes it from Continue Watching and Next Up.",
+    "overview": "Remove a whole show from Continue Watching and Next Up in one click. Requires the File Transformation plugin.",
+    "owner": "Bandar",
+    "category": "General",
+    "imageUrl": "https://raw.githubusercontent.com/bmuraykhi/jellyfin-plugin-untrack/main/assets/icon.png"
+  }
+]

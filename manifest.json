@@ -1,0 +1,85 @@
+[
+  {
+    "name": "Season Subtitle Downloader",
+    "guid": "a3c0e5c3-7d0d-4b91-9d1c-2e6f9b3a1c5d",
+    "description": "Adds a 'Download Subs' button to season and series pages that batch-downloads subtitles for every episode, in one or more languages.",
+    "overview": "One-click subtitle downloads for a whole season or series, in as many languages as you need. Requires the File Transformation plugin.",
+    "owner": "Bandar",
+    "category": "General",
+    "imageUrl": "https://raw.githubusercontent.com/bmuraykhi/Sub-Jellyfin/main/assets/icon.png",
+    "versions": [
+      {
+        "version": "2.0.0.0",
+        "changelog": "### Added\n\n- Download subtitles for several languages in one run: add any number of\n  languages in the dialog, skipping and failure reporting are tracked per\n  language, and Retry Failed re-runs only the exact episode/language pairs\n  that failed. Counts now tally per language, so one episode fetched in two\n  languages reports two downloads.\n- The download dialog now shows how many episodes already have subtitles in\n  each language you picked before you start, and lets you expand an episode\n  list to hand-pick which episodes to process — including a one-click \"Only\n  missing\" selection.\n- Unit tests for the injected web UI (vitest + jsdom), run in CI alongside\n  the existing C# tests and ESLint.\n\n### Changed\n\n- The options and progress dialogs now follow the active Jellyfin theme\n  instead of always rendering dark, and behave as proper modals: focus moves\n  into the dialog, Tab cycles within it, Escape closes/cancels, and focus\n  returns to the Download Subs button afterwards. Screen readers now announce\n  them as dialogs.\n- Subtitle language is now picked from a dropdown of the server's known\n  languages (with readable names) in both the download dialog and the plugin\n  settings page, instead of a free-text 3-letter code field. Free-text entry\n  remains as a fallback when the language list cannot be fetched.\n- Bumped `Newtonsoft.Json` from 13.0.1 to 13.0.4. Compile-time only: the\n  assembly version is 13.0.0.0 across all of 13.x, so the plugin still binds to\n  whatever `Newtonsoft.Json` the Jellyfin host loads.",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/bmuraykhi/Sub-Jellyfin/releases/download/v2.0.0.0/season-subtitle-downloader.zip",
+        "checksum": "AE104FE56A9CD8F6CD21F215265F43B3",
+        "timestamp": "2026-08-05T16:02:16Z"
+      },
+      {
+        "version": "1.0.2.0",
+        "changelog": "feat(release): ship icon.png in the plugin zip so My Plugins renders a logo",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/bmuraykhi/Sub-Jellyfin/releases/download/v1.0.2.0/season-subtitle-downloader.zip",
+        "checksum": "D09105765AABB5B3C043771BF8A3FACD",
+        "timestamp": "2026-08-03T15:17:57Z"
+      },
+      {
+        "version": "1.0.1.5",
+        "changelog": "feat(web): add debug diagnostics and injection reliability improvements",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/bmuraykhi/Sub-Jellyfin/releases/download/v1.0.1.5/season-subtitle-downloader.zip",
+        "checksum": "357313A6B02628E79ADE4B03BEE637CB",
+        "timestamp": "2026-06-05T22:27:15Z"
+      },
+      {
+        "version": "1.0.1.4",
+        "changelog": "fix(web): improve Download Subs button injection reliability",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/bmuraykhi/Sub-Jellyfin/releases/download/v1.0.1.4/season-subtitle-downloader.zip",
+        "checksum": "F5CEC2833F534B123558ADCD656BAA44",
+        "timestamp": "2026-06-05T21:50:28Z"
+      },
+      {
+        "version": "1.0.1.3",
+        "changelog": "feat: add top-N subtitle variants per episode (1-5)",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/bmuraykhi/Sub-Jellyfin/releases/download/v1.0.1.3/season-subtitle-downloader.zip",
+        "checksum": "C8EDBEA94FB7261193F192C5928DAF84",
+        "timestamp": "2026-05-14T11:58:25Z"
+      },
+      {
+        "version": "1.0.1.2",
+        "changelog": "docs(readme): update badges and describe series-level subtitle support",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/bmuraykhi/Sub-Jellyfin/releases/download/v1.0.1.2/season-subtitle-downloader.zip",
+        "checksum": "5505CA11FCF13F423852E51E175C8EBD",
+        "timestamp": "2026-05-08T22:23:34Z"
+      },
+      {
+        "version": "1.0.1.1",
+        "changelog": "docs(readme): simplify catalog install instructions and collapse manual fallback",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/bmuraykhi/Sub-Jellyfin/releases/download/v1.0.1.1/season-subtitle-downloader.zip",
+        "checksum": "42D0CD99680E6DD47645410A06C1CCCE",
+        "timestamp": "2026-05-07T20:37:14Z"
+      },
+      {
+        "version": "1.0.1",
+        "changelog": "docs(release): add catalog-based install flow and manual fallback",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/bmuraykhi/Sub-Jellyfin/releases/download/v1.0.1/season-subtitle-downloader.zip",
+        "checksum": "DE8151F02789D50ED9FB1A1A9A20AE95",
+        "timestamp": "2026-05-07T19:54:34Z"
+      },
+      {
+        "version": "1.0.0.0",
+        "changelog": "Initial release.",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/bmuraykhi/Sub-Jellyfin/releases/download/v0.1/season-subtitle-downloader.zip",
+        "checksum": "8B283B0FDDA92CA254A7C4C22C92757C",
+        "timestamp": "2026-05-05T00:00:00Z"
+      }
+    ]
+  }
+]
