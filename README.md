@@ -36,27 +36,47 @@ Each plugin's page has screenshots, settings and troubleshooting.
 
 ## Coming from the Sub-Jellyfin catalog?
 
-If you added `https://raw.githubusercontent.com/bmuraykhi/Sub-Jellyfin/main/manifest.json` for Season Subtitle
-Downloader, it keeps working and keeps getting that plugin's updates, but it only lists that one plugin. To get
-everything, replace it with the URL above under **Manage Repositories** (remove the old one, so Season Subtitle
-Downloader isn't listed twice). Installed plugins stay installed.
+`https://raw.githubusercontent.com/bmuraykhi/Sub-Jellyfin/main/manifest.json` is retired: it stops at Season Subtitle
+Downloader 3.0.0.0 and gets no more updates. Replace it with the URL above under **Manage Repositories** (remove the
+old one, so Season Subtitle Downloader isn't listed twice). Installed plugins stay installed.
 
 ## How the catalog is built
 
 `manifest.json` is generated, so don't edit it by hand. The **Update catalog** workflow runs
-`scripts/build_manifest.py` every hour, on demand (Actions → Update catalog → Run workflow) and whenever
-`plugins.json` changes. For each plugin in `plugins.json` it lists every published GitHub release that has the
-plugin's zip attached: the version number and target Jellyfin version come from the `meta.json` inside the zip, the
-changelog from the release notes, and the checksum is the zip's MD5. Versions already in the catalog are kept as
-they are, so a run only downloads new releases.
+`scripts/build_manifest.py` when a plugin publishes a release, when `plugins.json` or the script changes, once a day,
+and on demand (Actions → Update catalog → Run workflow). It rebuilds the whole catalog from the GitHub releases of
+the plugins in `plugins.json`, using every published release that has the plugin's zip attached:
 
-**Adding a plugin:** add an entry to `plugins.json` with its repository, the name of its release zip and its catalog
-details (name, id, description, overview, owner, category, icon URL). Its releases need a zip containing the DLL and
-`meta.json` (and the icon, if `meta.json` names one).
+- version, target Jellyfin version, name, description and the other details come from the `meta.json` inside the zip
+  (the details from the newest version);
+- the changelog is the version's `## [x.y.z.w]` section of the plugin's `CHANGELOG.md`, or else the release notes;
+- the checksum is the zip's MD5.
 
-**After publishing a release** it shows up within the hour, or straight away if you run the workflow. GitHub pauses
-scheduled workflows in repositories with no activity for 60 days; if that happens, run the workflow once by hand (or
-re-enable it on the Actions tab) and the hourly runs resume.
+When the result differs from `manifest.json`, the workflow commits it as the catalog's GitHub App.
+
+## Releasing a plugin
+
+Every plugin releases through the shared `.github/workflows/release-plugin.yml`, called from its own `release.yml`
+after its CI passes:
+
+1. Set `version` in `meta.json` and move the `## [Unreleased]` entries in `CHANGELOG.md` under
+   `## [x.y.z.w] – date`. Commit and push to `main`.
+2. `git tag vx.y.z.w && git push origin vx.y.z.w`
+
+The workflow checks that the tag matches `meta.json`, is on `main` and has a CHANGELOG section, and that `targetAbi`
+matches the Jellyfin package version. It then builds the zip (DLL, `meta.json` with the release date and changelog,
+icon), publishes the release with that CHANGELOG section as its notes, and tells this catalog to rebuild. Nothing is
+committed back to the plugin's repository. Running the plugin's Release workflow by hand builds the zip as a workflow
+artifact without publishing anything.
+
+## Adding a plugin
+
+1. Give it a `meta.json` (name, guid, description, overview, owner, category, version, targetAbi, imagePath), a
+   `CHANGELOG.md`, and a `release.yml` that calls the shared workflow (copy one from an existing plugin).
+2. In its repository settings, add the `CATALOG_APP_CLIENT_ID` variable and the `CATALOG_APP_PRIVATE_KEY` secret of
+   the catalog's GitHub App (this repository has the same two). The app only needs to be installed on this
+   repository, with read and write access to its contents.
+3. Add the repository, the release zip's file name and the icon URL to `plugins.json`.
 
 ## License
 
