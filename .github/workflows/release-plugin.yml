@@ -1,0 +1,207 @@
+name: Release plugin
+
+on:
+  workflow_call:
+    inputs:
+      project:
+        description: Path of the plugin's .csproj
+        type: string
+        required: true
+      zip:
+        description: File name of the release zip, as listed in plugins.json
+        type: string
+        required: true
+      dotnet-version:
+        description: .NET SDK to build with, e.g. 9.0.x
+        type: string
+        required: true
+      icon:
+        description: Icon shipped in the zip under meta.json's imagePath
+        type: string
+        default: assets/icon.png
+      catalog-repository:
+        description: Catalog repository, under the same owner
+        type: string
+        default: jellyfin-plugins
+      catalog-app-client-id:
+        description: Client ID of the GitHub App that can trigger the catalog
+        type: string
+        default: ''
+    secrets:
+      catalog-app-private-key:
+        description: Private key of that GitHub App
+        required: false
+
+permissions: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+      publish: ${{ steps.version.outputs.publish }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Resolve version
+        id: version
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          version=$(jq -r '.version // empty' meta.json)
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error file=meta.json::version must be four numbers like 1.2.3.4, not '$version'."
+            exit 1
+          fi
+          publish=false
+          if [ "$REF_TYPE" = tag ]; then
+            if [ "$REF_NAME" != "v$version" ]; then
+              echo "::error::Tag $REF_NAME doesn't match version $version in meta.json. Tag v$version instead."
+              exit 1
+            fi
+            if ! git merge-base --is-ancestor HEAD "origin/$DEFAULT_BRANCH"; then
+              echo "::error::Tag $REF_NAME isn't on $DEFAULT_BRANCH. Push the commit to $DEFAULT_BRANCH, then tag it."
+              exit 1
+            fi
+            publish=true
+          fi
+          {
+            echo "version=$version"
+            echo "tag=v$version"
+            echo "publish=$publish"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Extract release notes
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          awk -v heading="## [$VERSION]" '
+            index($0, heading) == 1 { found = 1; next }
+            found && /^## /         { exit }
+            found                   { lines[++n] = $0 }
+            END {
+              first = 1; last = n
+              while (first <= last && lines[first] ~ /^[[:space:]]*$/) first++
+              while (last >= first && lines[last] ~ /^[[:space:]]*$/) last--
+              for (i = first; i <= last; i++) print lines[i]
+            }
+          ' CHANGELOG.md > notes.md
+          if [ ! -s notes.md ]; then
+            echo "::error file=CHANGELOG.md::No '## [$VERSION]' section. Move the Unreleased entries under '## [$VERSION] – $(date -u +%F)'."
+            exit 1
+          fi
+          cat notes.md
+
+      - name: Check targetAbi
+        env:
+          PROJECT: ${{ inputs.project }}
+        run: |
+          abi=$(jq -r '.targetAbi // empty' meta.json)
+          package=$(sed -n 's/.*Include="Jellyfin\.Controller" Version="\([^"]*\)".*/\1/p' "$PROJECT" | head -n 1)
+          if [ -z "$abi" ] || [ -z "$package" ]; then
+            echo "::error::Need targetAbi in meta.json and a Jellyfin.Controller package reference in $PROJECT."
+            exit 1
+          fi
+          if [ "$(cut -d. -f1,2 <<< "$abi")" != "$(cut -d. -f1,2 <<< "$package")" ]; then
+            echo "::error file=meta.json::targetAbi $abi doesn't match Jellyfin.Controller $package in $PROJECT."
+            exit 1
+          fi
+
+      - name: Check catalog credentials
+        if: steps.version.outputs.publish == 'true'
+        env:
+          CLIENT_ID: ${{ inputs.catalog-app-client-id }}
+          PRIVATE_KEY: ${{ secrets.catalog-app-private-key }}
+        run: |
+          if [ -z "$CLIENT_ID" ] || [ -z "$PRIVATE_KEY" ]; then
+            echo "::error::Set the CATALOG_APP_CLIENT_ID variable and the CATALOG_APP_PRIVATE_KEY secret in this repository."
+            exit 1
+          fi
+
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68
+        with:
+          dotnet-version: ${{ inputs.dotnet-version }}
+
+      - name: Build
+        env:
+          PROJECT: ${{ inputs.project }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          dotnet publish "$PROJECT" -c Release -o publish \
+            -p:Version="$VERSION" -p:AssemblyVersion="$VERSION" -p:FileVersion="$VERSION"
+
+      - name: Package
+        env:
+          PROJECT: ${{ inputs.project }}
+          ZIP: ${{ inputs.zip }}
+          ICON: ${{ inputs.icon }}
+        run: |
+          dll=$(dotnet msbuild "$PROJECT" -getProperty:TargetFileName -p:Configuration=Release)
+          mkdir package
+          cp "publish/$dll" package/
+          jq --arg timestamp "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --rawfile changelog notes.md \
+            '.timestamp = $timestamp | .changelog = ($changelog | rtrimstr("\n"))' meta.json > package/meta.json
+          image=$(jq -r '.imagePath // empty' meta.json)
+          if [ -n "$image" ]; then
+            cp "$ICON" "package/$image"
+          fi
+          zip -q -j -X "$ZIP" package/*
+          unzip -l "$ZIP"
+          md5sum "$ZIP"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: release
+          path: |
+            ${{ inputs.zip }}
+            notes.md
+          if-no-files-found: error
+
+  publish:
+    needs: build
+    if: needs.build.outputs.publish == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          name: release
+
+      - name: Publish the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.build.outputs.tag }}
+          ZIP: ${{ inputs.zip }}
+        run: gh release create "$TAG" "$ZIP" --verify-tag --title "$TAG" --notes-file notes.md
+
+  notify-catalog:
+    needs: [build, publish]
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510
+        id: app
+        with:
+          client-id: ${{ inputs.catalog-app-client-id }}
+          private-key: ${{ secrets.catalog-app-private-key }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ inputs.catalog-repository }}
+
+      - name: Ask the catalog to rebuild
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          CATALOG: ${{ github.repository_owner }}/${{ inputs.catalog-repository }}
+          REPOSITORY: ${{ github.repository }}
+          TAG: ${{ needs.build.outputs.tag }}
+        run: |
+          gh api "repos/$CATALOG/dispatches" -f event_type=plugin-released \
+            -f "client_payload[repository]=$REPOSITORY" -f "client_payload[tag]=$TAG"
