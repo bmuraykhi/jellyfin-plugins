@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/bmuraykhi/Sub-Jellyfin/main/assets/icon.png",
     "versions": [
       {
+        "version": "3.0.0.0",
+        "changelog": "### Changed\n\n- Redesigned the download and progress dialogs:\n  - A fixed header (with the show and season name) and footer, with the\n    content scrolling in between, so the dialog always fits the screen. On\n    phones it opens as a sheet from the bottom.\n  - Each chosen language is a row with its full name, how many episodes\n    already have it, and a small coverage bar.\n  - The episode list is a proper disclosure. Its checkboxes are visible, and\n    each episode shows which of the chosen languages it already has.\n  - Results show as four tiles (downloaded, skipped, no match, failed),\n    coloured when they need attention, with the failures and misses listed\n    below.\n  - Colours follow the active Jellyfin theme, including custom themes.\n- The **Download Subs** button shows an hourglass while it loads the episodes.\n- Enter on a button now presses that button instead of starting the run, and\n  Enter in the language-code field adds the language.\n- README shows a demo of a full run and screenshots, recorded with a made-up\n  show (`docs/demo/record_demo.py` regenerates them).\n- README now states that the released plugin links against Jellyfin's GPL-3.0\n  assemblies, so the distributed DLL and zip are a combined work under the\n  GPL-3.0. The repository's own source stays under The Unlicense.\n- The plugin is now also published in a catalog for all my plugins:\n  `https://raw.githubusercontent.com/bmuraykhi/jellyfin-plugins/main/manifest.json`.\n  The old URL keeps working and keeps getting updates. The release workflow\n  now updates this plugin's catalog entry by its id instead of assuming it is\n  the first one.\n\n### Fixed\n\n- The dialogs' secondary buttons (Add, Cancel, Close, the language and episode\n  controls) were unreadable on Jellyfin 12.4: light boxes with light text.\n- The episode checkboxes were invisible (Jellyfin hides inputs with its\n  `emby-checkbox` class unless they are its own custom element), so you could\n  not see which episodes were selected.\n- With the episode list open the dialog could grow taller than the window,\n  cutting off its title and last episodes.\n- On phones the progress dialog ran edge to edge, and the summary toast\n  covered the dialog's buttons.\n- Some themes pushed Start below Cancel.",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/bmuraykhi/Sub-Jellyfin/releases/download/v3.0.0.0/season-subtitle-downloader.zip",
+        "checksum": "7EC4F9CBDCC49277F533163AD66DA59E",
+        "timestamp": "2026-11-01T16:37:37Z"
+      },
+      {
         "version": "2.0.0.0",
         "changelog": "### Added\n\n- Download subtitles for several languages in one run: add any number of\n  languages in the dialog, skipping and failure reporting are tracked per\n  language, and Retry Failed re-runs only the exact episode/language pairs\n  that failed. Counts now tally per language, so one episode fetched in two\n  languages reports two downloads.\n- The download dialog now shows how many episodes already have subtitles in\n  each language you picked before you start, and lets you expand an episode\n  list to hand-pick which episodes to process — including a one-click \"Only\n  missing\" selection.\n- Unit tests for the injected web UI (vitest + jsdom), run in CI alongside\n  the existing C# tests and ESLint.\n\n### Changed\n\n- The options and progress dialogs now follow the active Jellyfin theme\n  instead of always rendering dark, and behave as proper modals: focus moves\n  into the dialog, Tab cycles within it, Escape closes/cancels, and focus\n  returns to the Download Subs button afterwards. Screen readers now announce\n  them as dialogs.\n- Subtitle language is now picked from a dropdown of the server's known\n  languages (with readable names) in both the download dialog and the plugin\n  settings page, instead of a free-text 3-letter code field. Free-text entry\n  remains as a fallback when the language list cannot be fetched.\n- Bumped `Newtonsoft.Json` from 13.0.1 to 13.0.4. Compile-time only: the\n  assembly version is 13.0.0.0 across all of 13.x, so the plugin still binds to\n  whatever `Newtonsoft.Json` the Jellyfin host loads.",
         "targetAbi": "10.11.0.0",
@@ -79,6 +87,25 @@
         "sourceUrl": "https://github.com/bmuraykhi/Sub-Jellyfin/releases/download/v0.1/season-subtitle-downloader.zip",
         "checksum": "8B283B0FDDA92CA254A7C4C22C92757C",
         "timestamp": "2026-05-05T00:00:00Z"
+      }
+    ]
+  },
+  {
+    "name": "Untrack Show",
+    "guid": "b54dbd71-0824-420d-974c-b4f74ceed8f6",
+    "description": "Adds \"Untrack show\" to the episode, season and show menus in the web client and the Jellyfin phone apps. It marks the whole show unplayed for you, which removes it from Continue Watching and Next Up.",
+    "overview": "Remove a whole show from Continue Watching and Next Up in one click. Requires the File Transformation plugin.",
+    "owner": "Bandar",
+    "category": "General",
+    "imageUrl": "https://raw.githubusercontent.com/bmuraykhi/jellyfin-plugin-untrack/main/assets/icon.png",
+    "versions": [
+      {
+        "version": "1.0.2.0",
+        "changelog": "Untrack show is also in the multi-select menu (long-press a card, then ⋮), which is how phones reach it.",
+        "targetAbi": "12.4.0.0",
+        "sourceUrl": "https://github.com/bmuraykhi/jellyfin-plugin-untrack/releases/download/v1.0.2.0/untrack-show.zip",
+        "checksum": "4DE9AFB3CD1E91669FA6BE22C4289AAA",
+        "timestamp": "2026-11-01T16:24:53Z"
       }
     ]
   }
