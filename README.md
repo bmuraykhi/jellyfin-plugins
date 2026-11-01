@@ -5,11 +5,19 @@ One catalog for all my Jellyfin plugins.
 ## Add the catalog
 
 1. Dashboard → **Plugins** → **Manage Repositories** → **+**, and add
-   `https://raw.githubusercontent.com/bmuraykhi/jellyfin-plugins/main/manifest.json`
+
+   ```
+   https://raw.githubusercontent.com/bmuraykhi/jellyfin-plugins/main/manifest.json
+   ```
+
 2. **Catalog** → pick a plugin → **Install**, then restart Jellyfin.
 
 The plugins need the [File Transformation](https://github.com/IAmParadox27/jellyfin-plugin-file-transformation)
-plugin. Add `https://www.iamparadox.dev/jellyfin/plugins/manifest.json` the same way and install it first.
+plugin. Add its catalog the same way and install it first:
+
+```
+https://www.iamparadox.dev/jellyfin/plugins/manifest.json
+```
 
 If you added the old `https://raw.githubusercontent.com/bmuraykhi/Sub-Jellyfin/main/manifest.json` catalog, replace it
 with this one. The old one is retired.
