@@ -93,12 +93,20 @@
   {
     "name": "Untrack Show",
     "guid": "b54dbd71-0824-420d-974c-b4f74ceed8f6",
-    "description": "Adds \"Untrack show\" to the episode, season and show menus in the web client and the Jellyfin phone apps. It marks the whole show unplayed for you, which removes it from Continue Watching and Next Up.",
+    "description": "Adds \"Untrack show\" to the episode, season and show menus in web browsers, the Jellyfin desktop app and the Jellyfin phone apps. It marks the whole show unplayed for you, which removes it from Continue Watching and Next Up.",
     "overview": "Remove a whole show from Continue Watching and Next Up in one click. Requires the File Transformation plugin.",
     "owner": "Bandar",
     "category": "General",
     "imageUrl": "https://raw.githubusercontent.com/bmuraykhi/jellyfin-plugin-untrack/main/assets/icon.png",
     "versions": [
+      {
+        "version": "1.0.3.0",
+        "changelog": "### Added\n\n- **Untrack show** asks you to confirm first, and says that every episode will be marked unwatched.\n\n### Changed\n\n- New plugin logo with the plugin's name. It fills the wide plugin tile instead of being zoomed and cropped.\n\n### Fixed\n\n- The \"Untracked\" message shows once the page has reloaded, instead of disappearing after half a second.",
+        "targetAbi": "12.4.0.0",
+        "sourceUrl": "https://github.com/bmuraykhi/jellyfin-plugin-untrack/releases/download/v1.0.3.0/untrack-show.zip",
+        "checksum": "484CC1246BA4792AD477BDDC6D778311",
+        "timestamp": "2026-11-02T18:58:23Z"
+      },
       {
         "version": "1.0.2.0",
         "changelog": "First public release.\n\n### Added\n\n- **Untrack show** in the ⋮ menu of episodes, seasons and shows, in the web interface and the Jellyfin phone apps. It\n  marks the whole show unplayed, which removes it from Continue Watching and Next Up.\n- The same option in the multi-select menu (long-press a card, then ⋮), which is how phones reach it.",
