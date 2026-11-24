@@ -100,6 +100,14 @@
     "imageUrl": "https://raw.githubusercontent.com/bmuraykhi/jellyfin-plugin-untrack/main/assets/icon.png",
     "versions": [
       {
+        "version": "1.1.0.0",
+        "changelog": "### Changed\n\n- **Untrack show** only appears for shows you've watched or started, since untracking any other show does nothing.\n- **Untrack show** sits with the other actions for you (Select, Add to playlist) instead of at the bottom of the menu,\n  below the admin items.\n\n### Fixed\n\n- File Transformation also hands some of jellyfin-web's script files to the plugin. The plugin now leaves them alone\n  instead of looking for a `</body>` in them.",
+        "targetAbi": "12.4.0.0",
+        "sourceUrl": "https://github.com/bmuraykhi/jellyfin-plugin-untrack/releases/download/v1.1.0.0/untrack-show.zip",
+        "checksum": "16E56D1100B8AD518C1F9A907CA3D8A9",
+        "timestamp": "2026-11-24T17:24:47Z"
+      },
+      {
         "version": "1.0.3.0",
         "changelog": "### Added\n\n- **Untrack show** asks you to confirm first, and says that every episode will be marked unwatched.\n\n### Changed\n\n- New plugin logo with the plugin's name. It fills the wide plugin tile instead of being zoomed and cropped.\n\n### Fixed\n\n- The \"Untracked\" message shows once the page has reloaded, instead of disappearing after half a second.",
         "targetAbi": "12.4.0.0",
